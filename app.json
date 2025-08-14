@@ -25,6 +25,8 @@
     },
     "plugins": [
       "expo-router",
+      "expo-location",
+      "react-native-bluetooth-status",
       [
         "expo-splash-screen",
         {
