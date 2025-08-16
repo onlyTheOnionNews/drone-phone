@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android", "web"],
+  "apple": {
+    "modules": ["RIDBroadcastModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.ridbroadcast.RIDBroadcastModule"]
+  }
+}
