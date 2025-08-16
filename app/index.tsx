@@ -1,4 +1,3 @@
-import { registerRootComponent } from 'expo';
 import * as Location from 'expo-location';
 import { LocationObject, LocationSubscription } from 'expo-location';
 import { useEffect, useRef, useState } from 'react';
@@ -281,4 +280,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default registerRootComponent(App);
+export default App;

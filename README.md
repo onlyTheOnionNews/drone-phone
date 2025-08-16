@@ -16,6 +16,37 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npx expo start
    ```
 
+3. Generate native code
+
+  ### Android + IOS
+   ```bash
+   npx expo prebuild --platform all
+   ```
+
+   ### Android
+   ```bash
+   npx expo prebuild --platform android
+   ```
+
+   ### IOS
+   ```bash
+   npx expo prebuild --platform ios
+   ```
+
+4. Link libraries
+
+   ```bash
+   cd android
+   ```
+   OR
+   ```bash
+   cd ios
+   ```
+
+   ```bash
+   pod install
+   ```
+
 In the output, you'll find options to open the app in a
 
 - [development build](https://docs.expo.dev/develop/development-builds/introduction/)
@@ -48,3 +79,5 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
