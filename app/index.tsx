@@ -204,6 +204,8 @@ const App = () => {
             </TouchableOpacity>
             <Text style={styles.label}>Private Key (Base64 PKCS#8)</Text>
             <TextInput style={[styles.input, styles.keyInput]} value={privateKey} editable={false} multiline />
+            <Text style={styles.label}>Public Key (Base64 PKCS#8)</Text>
+            <TextInput style={[styles.input, styles.keyInput]} value={publicKey} editable={false} multiline />
         </View>
         
         <View style={styles.section}>
