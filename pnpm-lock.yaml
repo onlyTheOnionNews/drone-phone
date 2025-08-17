@@ -74,9 +74,6 @@ importers:
       react-native:
         specifier: 0.79.5
         version: 0.79.5(@babel/core@7.28.0)(@types/react@19.0.14)(react@19.0.0)
-      react-native-bluetooth-status:
-        specifier: github:trabk1992/react-native-bluetooth-status
-        version: https://codeload.github.com/trabk1992/react-native-bluetooth-status/tar.gz/7ddc39518b105ce8b8d837122f5642c7edddb6fe(react-native@0.79.5(@babel/core@7.28.0)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)
       react-native-gesture-handler:
         specifier: ~2.24.0
         version: 2.24.0(react-native@0.79.5(@babel/core@7.28.0)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)
@@ -631,9 +628,6 @@ packages:
 
   '@craftzdog/react-native-buffer@6.1.0':
     resolution: {integrity: sha512-lJXdjZ7fTllLbzDrwg/FrJLjQ5sBcAgwcqgAB6OPpXTHdCenEhHZblQpfmBLLe7/S7m0yKXL3kN3jpwOEkpjGg==}
-
-  '@cs125/wait-until@0.0.3':
-    resolution: {integrity: sha512-Z3+GXZbAjiiI0cJi1si+WfBBPfmLwZ9Tk4wqyFJGeZHJilyveBCpSktHdJlmqjHBBvrMi8ymXefYi2S833LhRA==}
 
   '@egjs/hammerjs@2.0.17':
     resolution: {integrity: sha512-XQsZgjm2EcVUiZQf11UBJQfmZeEmOW8DpI1gsFeln6w0ae0ii4dMQEQ0kjl6DspdWX1aGY1/loyXnP0JS06e/A==}
@@ -3198,13 +3192,6 @@ packages:
   react-is@19.1.1:
     resolution: {integrity: sha512-tr41fA15Vn8p4X9ntI+yCyeGSf1TlYaY5vlTZfQmeLBrFo3psOPX6HhTDnFNL9uj3EhP0KAQ80cugCl4b4BERA==}
 
-  react-native-bluetooth-status@https://codeload.github.com/trabk1992/react-native-bluetooth-status/tar.gz/7ddc39518b105ce8b8d837122f5642c7edddb6fe:
-    resolution: {tarball: https://codeload.github.com/trabk1992/react-native-bluetooth-status/tar.gz/7ddc39518b105ce8b8d837122f5642c7edddb6fe}
-    version: 1.5.1
-    peerDependencies:
-      react: ^16.8.0
-      react-native: ^0.61.0
-
   react-native-edge-to-edge@1.6.0:
     resolution: {integrity: sha512-2WCNdE3Qd6Fwg9+4BpbATUxCLcouF6YRY7K+J36KJ4l3y+tWN6XCqAC4DuoGblAAbb2sLkhEDp4FOlbOIot2Og==}
     peerDependencies:
@@ -4615,8 +4602,6 @@ snapshots:
     transitivePeerDependencies:
       - react
       - react-native
-
-  '@cs125/wait-until@0.0.3': {}
 
   '@egjs/hammerjs@2.0.17':
     dependencies:
@@ -7811,12 +7796,6 @@ snapshots:
   react-is@18.3.1: {}
 
   react-is@19.1.1: {}
-
-  react-native-bluetooth-status@https://codeload.github.com/trabk1992/react-native-bluetooth-status/tar.gz/7ddc39518b105ce8b8d837122f5642c7edddb6fe(react-native@0.79.5(@babel/core@7.28.0)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0):
-    dependencies:
-      '@cs125/wait-until': 0.0.3
-      react: 19.0.0
-      react-native: 0.79.5(@babel/core@7.28.0)(@types/react@19.0.14)(react@19.0.0)
 
   react-native-edge-to-edge@1.6.0(react-native@0.79.5(@babel/core@7.28.0)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0):
     dependencies:

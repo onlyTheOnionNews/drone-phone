@@ -33,7 +33,6 @@
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-native": "0.79.5",
-    "react-native-bluetooth-status": "github:trabk1992/react-native-bluetooth-status",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-peripheral": "github:onlyTheOnionNews/react-native-peripheral",
     "react-native-quick-crypto": "^0.7.17",
