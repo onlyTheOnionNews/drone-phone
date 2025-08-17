@@ -1,8 +1,10 @@
+# RidBroadcast.podspec
+
 Pod::Spec.new do |s|
   s.name           = 'RidBroadcast'
   s.version        = '1.0.0'
-  s.summary        = 'A sample project summary'
-  s.description    = 'A sample project description'
+  s.summary        = 'Broadcast remote id over bluetooth'
+  s.description    = 'Broadcast module for drone remote id'
   s.author         = ''
   s.homepage       = 'https://docs.expo.dev/modules/'
   s.platforms      = {

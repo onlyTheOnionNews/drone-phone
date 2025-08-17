@@ -1,4 +1,4 @@
-package com.droneremoteid
+package com.RidBroadcast
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
@@ -19,7 +19,7 @@ import java.security.Signature
 import java.security.spec.PKCS8EncodedKeySpec
 import java.util.*
 
-class RIDBroadcastModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+class RidBroadcastModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
     private var bluetoothAdapter: BluetoothAdapter?
     private var bluetoothLeAdvertiser: BluetoothLeAdvertiser?
@@ -37,7 +37,7 @@ class RIDBroadcastModule(reactContext: ReactApplicationContext) : ReactContextBa
     }
 
     override fun getName(): String {
-        return "RIDBroadcast"
+        return "RidBroadcast"
     }
 
     /**
@@ -242,7 +242,7 @@ class RIDBroadcastModule(reactContext: ReactApplicationContext) : ReactContextBa
             return buffer.array().copyOf(buffer.position())
 
         } catch (e: Exception) {
-            Log.e("RIDBroadcastModule", "Error creating authentication payload: ${e.message}")
+            Log.e("RidBroadcastModule", "Error creating authentication payload: ${e.message}")
             return createPlaceholderAuth()
         }
     }

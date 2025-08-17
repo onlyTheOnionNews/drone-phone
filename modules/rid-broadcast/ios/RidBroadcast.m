@@ -1,11 +1,13 @@
+// RidBroadcast.m
+
 #import <React/RCTBridgeModule.h>
 
-// This macro exposes your Swift class 'RIDBroadcast' to React Native.
-// The name "RIDBroadcast" is how you will access it in JavaScript.
-RCT_EXTERN_MODULE(RIDBroadcast, NSObject)
+// This macro exposes your Swift class 'RidBroadcast' to React Native.
+// The name "RidBroadcast" is how you will access it in JavaScript.
+RCT_EXTERN_MODULE(RidBroadcast, NSObject)
 
-// This macro exposes the 'startBroadcasting' method from your Swift class.
-RCT_EXTERN_METHOD(startBroadcasting:(NSDictionary *)data
+// This macro exposes the 'startBroadcast' method from your Swift class.
+RCT_EXTERN_METHOD(startBroadcast:(NSDictionary *)data
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 

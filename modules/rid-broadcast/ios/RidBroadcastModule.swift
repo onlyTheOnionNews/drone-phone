@@ -1,10 +1,12 @@
+// RidBroadcastModule.swift
+
 import Foundation
 import CoreBluetooth
 import CryptoKit // Modern cryptography framework for signing
 
 // The @objc attribute makes this Swift class available to the Objective-C runtime.
-@objc(RIDBroadcast)
-class RIDBroadcast: NSObject, CBPeripheralManagerDelegate {
+@objc(RidBroadcast)
+class RidBroadcast: NSObject, CBPeripheralManagerDelegate {
 
   private var peripheralManager: CBPeripheralManager!
   private var broadcastTimer: Timer?
@@ -32,8 +34,8 @@ class RIDBroadcast: NSObject, CBPeripheralManagerDelegate {
    * @param resolve The promise's resolve function.
    * @param reject The promise's reject function.
    */
-  @objc(startBroadcasting:resolver:rejecter:)
-  func startBroadcasting(data: [String: Any], resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+  @objc(startBroadcast:resolver:rejecter:)
+  func startBroadcast(data: [String: Any], resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     guard peripheralManager.state == .poweredOn else {
       reject("BLUETOOTH_OFF", "Bluetooth is not powered on.", nil)
       return
@@ -186,7 +188,7 @@ class RIDBroadcast: NSObject, CBPeripheralManagerDelegate {
       payload.append(signature.rawRepresentation.prefix(16)) // Truncate signature for this example
       return payload
     } catch {
-      print("[RIDBroadcast] Error creating auth payload: \(error)")
+      print("[RidBroadcast] Error creating auth payload: \(error)")
       return createPlaceholderAuth()
     }
   }
@@ -202,12 +204,12 @@ class RIDBroadcast: NSObject, CBPeripheralManagerDelegate {
       // If Bluetooth is turned off, stop everything.
       stopBroadcastInternal()
     }
-    print("[RIDBroadcast] Peripheral manager state changed to: \(peripheral.state.rawValue)")
+    print("[RidBroadcast] Peripheral manager state changed to: \(peripheral.state.rawValue)")
   }
     
   func peripheralManagerDidStartAdvertising(_ peripheral: CBPeripheralManager, error: Error?) {
     if let error = error {
-        print("[RIDBroadcast] Failed to start advertising: \(error.localizedDescription)")
+        print("[RidBroadcast] Failed to start advertising: \(error.localizedDescription)")
     }
   }
 }
