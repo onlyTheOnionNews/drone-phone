@@ -1,9 +1,9 @@
 {
   "platforms": ["apple", "android", "web"],
   "apple": {
-    "modules": ["RIDBroadcastModule"]
+    "modules": ["RidBroadcastModule"]
   },
   "android": {
-    "modules": ["expo.modules.ridbroadcast.RIDBroadcastModule"]
+    "modules": ["expo.modules.ridbroadcast.RidBroadcastModule"]
   }
 }

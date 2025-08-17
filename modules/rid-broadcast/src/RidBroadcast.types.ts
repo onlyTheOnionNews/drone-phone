@@ -1,5 +1,5 @@
 /**
- * This file provides TypeScript definitions for the RIDBroadcast native module.
+ * This file provides TypeScript definitions for the RidBroadcast native module.
  * It ensures type safety when calling the native functions from your JavaScript/TypeScript code.
  */
 
@@ -8,7 +8,7 @@
  * to the `startBroadcast` method. It includes all the necessary
  * information for all the different RID payload frames.
  */
-export type RIDBroadcastData = {
+export type RidBroadcastData = {
   // Basic ID
   uasId: string;
 
@@ -46,13 +46,13 @@ export type RIDBroadcastData = {
  * Defines the interface of the native module, exposing its methods
  * to the React Native bridge.
  */
-export interface RIDBroadcastModule {
+export interface RidBroadcastModule {
   /**
    * Starts the periodic broadcast, automatically cycling through RID frames.
    * @param data An object containing all required drone data.
    * @returns A promise that resolves with `true` if the broadcast starts successfully.
    */
-  startBroadcast(data: RIDBroadcastData): Promise<boolean>;
+  startBroadcast(data: RidBroadcastData): Promise<boolean>;
 
   /**
    * Stops the broadcast.
