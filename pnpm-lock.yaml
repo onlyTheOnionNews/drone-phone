@@ -77,9 +77,6 @@ importers:
       react-native-gesture-handler:
         specifier: ~2.24.0
         version: 2.24.0(react-native@0.79.5(@babel/core@7.28.0)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)
-      react-native-peripheral:
-        specifier: github:onlyTheOnionNews/react-native-peripheral
-        version: https://codeload.github.com/onlyTheOnionNews/react-native-peripheral/tar.gz/275b2c55fb9388f9f708ba0cd19f0b726e742ecf(react-native@0.79.5(@babel/core@7.28.0)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)
       react-native-quick-crypto:
         specifier: ^0.7.17
         version: 0.7.17(react-native@0.79.5(@babel/core@7.28.0)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0)
@@ -3215,13 +3212,6 @@ packages:
     peerDependencies:
       react: '*'
       react-native: '*'
-
-  react-native-peripheral@https://codeload.github.com/onlyTheOnionNews/react-native-peripheral/tar.gz/275b2c55fb9388f9f708ba0cd19f0b726e742ecf:
-    resolution: {tarball: https://codeload.github.com/onlyTheOnionNews/react-native-peripheral/tar.gz/275b2c55fb9388f9f708ba0cd19f0b726e742ecf}
-    version: 0.0.3
-    peerDependencies:
-      react: 18.2.00
-      react-native: 0.74.5
 
   react-native-quick-base64@2.2.1:
     resolution: {integrity: sha512-rAECaDhq3v+P8IM10cLgUVvt3kPJq3v+Jznp7tQRLXk1LlV/VCepump3am0ObwHlE6EoXblm4cddPJoXAlO+CQ==}
@@ -7816,11 +7806,6 @@ snapshots:
       react-native: 0.79.5(@babel/core@7.28.0)(@types/react@19.0.14)(react@19.0.0)
 
   react-native-is-edge-to-edge@1.2.1(react-native@0.79.5(@babel/core@7.28.0)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0):
-    dependencies:
-      react: 19.0.0
-      react-native: 0.79.5(@babel/core@7.28.0)(@types/react@19.0.14)(react@19.0.0)
-
-  react-native-peripheral@https://codeload.github.com/onlyTheOnionNews/react-native-peripheral/tar.gz/275b2c55fb9388f9f708ba0cd19f0b726e742ecf(react-native@0.79.5(@babel/core@7.28.0)(@types/react@19.0.14)(react@19.0.0))(react@19.0.0):
     dependencies:
       react: 19.0.0
       react-native: 0.79.5(@babel/core@7.28.0)(@types/react@19.0.14)(react@19.0.0)
