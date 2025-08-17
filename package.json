@@ -12,9 +12,9 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
-    "@react-navigation/bottom-tabs": "^7.3.10",
-    "@react-navigation/elements": "^2.3.8",
-    "@react-navigation/native": "^7.1.6",
+    "@react-navigation/bottom-tabs": "^7.4.6",
+    "@react-navigation/elements": "^2.6.3",
+    "@react-navigation/native": "^7.1.17",
     "buffer": "^6.0.3",
     "expo": "~53.0.20",
     "expo-blur": "~14.1.5",
@@ -35,16 +35,16 @@
     "react-native": "0.79.5",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-quick-crypto": "^0.7.17",
-    "react-native-reanimated": "~3.17.4",
+    "react-native-reanimated": "~3.17.5",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",
     "react-native-web": "~0.20.0",
     "react-native-webview": "13.13.5"
   },
   "devDependencies": {
-    "@babel/core": "^7.25.2",
-    "@types/react": "~19.0.10",
-    "eslint": "^9.25.0",
+    "@babel/core": "^7.28.3",
+    "@types/react": "~19.0.14",
+    "eslint": "^9.33.0",
     "eslint-config-expo": "~9.2.0",
     "typescript": "~5.8.3"
   },
