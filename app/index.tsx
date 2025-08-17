@@ -14,7 +14,6 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Import the crypto polyfill and its required dependency
-import 'react-native-get-random-values';
 import crypto from 'react-native-quick-crypto';
 
 // Access the custom native module you created
