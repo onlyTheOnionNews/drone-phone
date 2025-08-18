@@ -1,5 +1,5 @@
 /**
- * This file provides TypeScript definitions for the RidBroadcast native module.
+ * This file provides TypeScript definitions for the RidBroadcastModule native module.
  * It ensures type safety when calling the native functions from your JavaScript/TypeScript code.
  */
 

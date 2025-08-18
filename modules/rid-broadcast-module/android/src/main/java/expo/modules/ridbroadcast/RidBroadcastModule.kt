@@ -1,4 +1,4 @@
-package com.RidBroadcast
+package com.RidBroadcastModule
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
@@ -37,7 +37,7 @@ class RidBroadcastModule(reactContext: ReactApplicationContext) : ReactContextBa
     }
 
     override fun getName(): String {
-        return "RidBroadcast"
+        return "RidBroadcastModule"
     }
 
     /**

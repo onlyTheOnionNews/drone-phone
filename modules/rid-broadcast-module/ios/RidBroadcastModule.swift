@@ -1,83 +1,94 @@
 // RidBroadcastModule.swift
 
+import ExpoModulesCore
 import Foundation
 import CoreBluetooth
 import CryptoKit // Modern cryptography framework for signing
 
-// The @objc attribute makes this Swift class available to the Objective-C runtime.
-@objc(RidBroadcast)
-class RidBroadcast: NSObject, CBPeripheralManagerDelegate {
+// Define a custom error for when Bluetooth is powered off.
+// This makes error handling on the JavaScript side much cleaner.
+struct BluetoothUnavailableError: Exception {
+  override var reason: String {
+    "Bluetooth is not powered on. Please enable it in your device settings."
+  }
+}
 
-  private var peripheralManager: CBPeripheralManager!
+public class RidBroadcastModule: Module, CBPeripheralManagerDelegate {
+  
+  // Private properties to manage the Bluetooth state.
+  private var peripheralManager: CBPeripheralManager?
   private var broadcastTimer: Timer?
   private var allDroneData: [String: Any]?
 
-  // ASTM F3411-22a Service UUID
+  // ASTM F3411-22a Service UUID for Remote ID.
   private let ridServiceUUID = CBUUID(string: "0000FFFA-0000-1000-8000-00805F9B34FB")
-
-  override init() {
-    super.init()
-    // Initialize the peripheral manager on a background queue for performance.
-    let queue = DispatchQueue(label: "com.yourprojectname.rid.bluetooth")
-    peripheralManager = CBPeripheralManager(delegate: self, queue: queue)
-  }
-
-  // This tells React Native to initialize the module on the main thread.
-  @objc
-  static func requiresMainQueueSetup() -> Bool {
-    return true
-  }
-
-  /**
-   * Starts a periodic broadcast, automatically cycling through different RID frames.
-   * @param data A dictionary containing all necessary data for all frame types.
-   * @param resolve The promise's resolve function.
-   * @param reject The promise's reject function.
-   */
-  @objc(startBroadcast:resolver:rejecter:)
-  func startBroadcast(data: [String: Any], resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    guard peripheralManager.state == .poweredOn else {
-      reject("BLUETOOTH_OFF", "Bluetooth is not powered on.", nil)
-      return
-    }
-
-    // Store the data and start the timer
-    allDroneData = data
-    stopBroadcastInternal() // Ensure any old timer is stopped
-
-    // Use a Timer to call updateBroadcastFrame every second
-    broadcastTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-        self?.updateBroadcastFrame()
-    }
-    
-    // Run the timer on a background thread to avoid blocking the UI
-    if let timer = broadcastTimer {
-        RunLoop.current.add(timer, forMode: .common)
-    }
-
-    resolve(true)
-  }
   
-  /**
-   * Stops the Bluetooth LE broadcast and cancels the timer.
-   */
-  @objc(stopBroadcast:rejecter:)
-  func stopBroadcast(resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    stopBroadcastInternal()
-    resolve(true)
+  // The main definition block for the Expo Module.
+  // This is where you define the module's name, methods, and lifecycle.
+  public func definition() -> ModuleDefinition {
+    
+    // Sets the name of the module that will be used in JavaScript.
+    // e.g., import { RidBroadcastModule } from 'your-module';
+    Name("RidBroadcastModule")
+
+    // The OnCreate block is called when the module is first initialized.
+    // It's the perfect place to set up the peripheral manager.
+    OnCreate {
+      let queue = DispatchQueue(label: "com.dronephone.rid.bluetooth")
+      peripheralManager = CBPeripheralManager(delegate: self, queue: queue)
+    }
+
+    // The OnDestroy block is called when the module is deallocated.
+    // It's crucial to clean up resources like timers and stop advertising.
+    OnDestroy {
+      stopBroadcastInternal()
+    }
+
+    /**
+     * Starts a periodic broadcast, automatically cycling through different RID frames.
+     * @param data A dictionary containing all necessary data for all frame types.
+     */
+    AsyncFunction("startBroadcast") { (data: [String: Any]) throws {
+      guard let manager = peripheralManager, manager.state == .poweredOn else {
+        throw BluetoothUnavailableError()
+      }
+
+      // Store the data and start the timer on the main thread for reliability.
+      self.allDroneData = data
+      
+      DispatchQueue.main.async {
+          self.stopBroadcastInternal() // Ensure any old timer is stopped
+          
+          // Use a Timer to call updateBroadcastFrame every second.
+          self.broadcastTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+              self?.updateBroadcastFrame()
+          }
+      }
+    }}
+
+    /**
+     * Stops the Bluetooth LE broadcast and cancels the timer.
+     */
+    AsyncFunction("stopBroadcast") {
+      stopBroadcastInternal()
+    }
   }
+
+  // MARK: - Internal Logic
 
   private func stopBroadcastInternal() {
-    broadcastTimer?.invalidate()
-    broadcastTimer = nil
-    if peripheralManager.isAdvertising {
-        peripheralManager.stopAdvertising()
+    DispatchQueue.main.async {
+        self.broadcastTimer?.invalidate()
+        self.broadcastTimer = nil
+    }
+    if let manager = peripheralManager, manager.isAdvertising {
+      manager.stopAdvertising()
     }
   }
 
   /// This function is called by the timer to generate and broadcast a new frame.
   private func updateBroadcastFrame() {
-    guard let data = allDroneData, peripheralManager.state == .poweredOn else { return }
+    guard let data = allDroneData, let manager = peripheralManager, manager.state == .poweredOn else { return }
 
     let payload = createRemoteIdPayload(data: data)
     guard !payload.isEmpty else { return }
@@ -88,10 +99,10 @@ class RidBroadcast: NSObject, CBPeripheralManagerDelegate {
     ]
     
     // To update advertising data, we must restart it.
-    if peripheralManager.isAdvertising {
-        peripheralManager.stopAdvertising()
+    if manager.isAdvertising {
+      manager.stopAdvertising()
     }
-    peripheralManager.startAdvertising(advertisementData)
+    manager.startAdvertising(advertisementData)
   }
   
   /// Creates a single RID payload frame based on the current time.
@@ -116,7 +127,12 @@ class RidBroadcast: NSObject, CBPeripheralManagerDelegate {
     guard let uasId = data["uasId"] as? String else { return Data() }
     var payload = Data()
     payload.append(0x00) // Message Type 0x0 (Basic ID), UAS ID Type 0 (Serial)
-    payload.append(contentsOf: uasId.data(using: .ascii)!.prefix(20))
+    
+    var uasIdData = uasId.data(using: .ascii) ?? Data()
+    pad(&uasIdData, to: 20) // Pad or truncate UAS ID to 20 bytes
+    payload.append(uasIdData)
+
+    pad(&payload, to: 25) // Ensure final payload is 25 bytes
     return payload
   }
 
@@ -132,8 +148,8 @@ class RidBroadcast: NSObject, CBPeripheralManagerDelegate {
     payload.append(int16: Int16((data["altitudePressure"] as? Double ?? 0.0) * 10))
     payload.append(int16: Int16((data["altitudeGeodetic"] as? Double ?? 0.0) * 10))
     payload.append(int16: Int16((data["height"] as? Double ?? 0.0) * 10))
-    payload.append(contentsOf: [0x00, 0x00]) // Accuracies
-    payload.append(int16: 0) // Timestamp
+    // The original payload was > 25 bytes. We now pad/truncate to meet the spec.
+    pad(&payload, to: 25)
     return payload
   }
     
@@ -142,7 +158,13 @@ class RidBroadcast: NSObject, CBPeripheralManagerDelegate {
     var payload = Data()
     payload.append(0x20) // Message Type 0x2
     payload.append(0x01) // Description Type: Text
-    payload.append(contentsOf: description.data(using: .ascii)!.prefix(23))
+    
+    var descriptionData = description.data(using: .ascii) ?? Data()
+    pad(&descriptionData, to: 23) // Pad or truncate description to 23 bytes
+    payload.append(descriptionData)
+
+    // This should already be 25 bytes, but pad just in case.
+    pad(&payload, to: 25)
     return payload
   }
 
@@ -156,6 +178,7 @@ class RidBroadcast: NSObject, CBPeripheralManagerDelegate {
     payload.append(int32: Int32((data["areaRadius"] as? Int) ?? 0))
     payload.append(int32: Int32((data["areaCeiling"] as? Double ?? 0.0) * 10))
     payload.append(int32: Int32((data["areaFloor"] as? Double ?? 0.0) * 10))
+    pad(&payload, to: 25) // Ensure final payload is 25 bytes
     return payload
   }
 
@@ -164,7 +187,12 @@ class RidBroadcast: NSObject, CBPeripheralManagerDelegate {
     var payload = Data()
     payload.append(0x40) // Message Type 0x4
     payload.append(0x00) // Operator ID Type: CAA
-    payload.append(contentsOf: operatorId.data(using: .ascii)!.prefix(20))
+    
+    var operatorIdData = operatorId.data(using: .ascii) ?? Data()
+    pad(&operatorIdData, to: 20) // Pad or truncate operator ID to 20 bytes
+    payload.append(operatorIdData)
+
+    pad(&payload, to: 25) // Ensure final payload is 25 bytes
     return payload
   }
 
@@ -185,36 +213,51 @@ class RidBroadcast: NSObject, CBPeripheralManagerDelegate {
       var payload = Data()
       payload.append(0x50) // Message Type 0x5
       payload.append(0x01) // Auth Type: Signature
-      payload.append(signature.rawRepresentation.prefix(16)) // Truncate signature for this example
+      payload.append(signature.rawRepresentation.prefix(16)) // Truncate signature
+      pad(&payload, to: 25) // Ensure final payload is 25 bytes
       return payload
     } catch {
-      print("[RidBroadcast] Error creating auth payload: \(error)")
+      print("[RidBroadcastModule] Error creating auth payload: \(error)")
       return createPlaceholderAuth()
     }
   }
 
   private func createPlaceholderAuth() -> Data {
-    return Data([0x50, 0x01] + [UInt8](repeating: 0xAA, count: 16))
+    var payload = Data([0x50, 0x01] + [UInt8](repeating: 0xAA, count: 16))
+    pad(&payload, to: 25) // Ensure final payload is 25 bytes
+    return payload
   }
 
   // MARK: - CBPeripheralManagerDelegate
 
-  func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
+  public func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
     if peripheral.state == .poweredOff {
       // If Bluetooth is turned off, stop everything.
       stopBroadcastInternal()
     }
-    print("[RidBroadcast] Peripheral manager state changed to: \(peripheral.state.rawValue)")
+    print("[RidBroadcastModule] Peripheral manager state changed to: \(peripheral.state.rawValue)")
   }
     
-  func peripheralManagerDidStartAdvertising(_ peripheral: CBPeripheralManager, error: Error?) {
+  public func peripheralManagerDidStartAdvertising(_ peripheral: CBPeripheralManager, error: Error?) {
     if let error = error {
-        print("[RidBroadcast] Failed to start advertising: \(error.localizedDescription)")
+        print("[RidBroadcastModule] Failed to start advertising: \(error.localizedDescription)")
     }
+  }
+
+  // MARK: - Helper Functions
+
+  /// Ensures a Data object is exactly a certain length by padding it with zeros or truncating it.
+  private func pad(_ data: inout Data, to length: Int) {
+      if data.count > length {
+          data = data.prefix(length)
+      } else if data.count < length {
+          data.append(Data(repeating: 0, count: length - data.count))
+      }
   }
 }
 
 // Helper extension to append integers with correct byte order (little-endian)
+// This remains unchanged.
 extension Data {
     mutating func append(int16: Int16) {
         var value = int16.littleEndian

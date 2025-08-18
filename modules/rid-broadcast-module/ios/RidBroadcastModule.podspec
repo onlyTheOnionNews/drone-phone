@@ -1,10 +1,10 @@
-# RidBroadcast.podspec
+# RidBroadcastModule.podspec
 
 Pod::Spec.new do |s|
-  s.name           = 'RidBroadcast'
+  s.name           = 'RidBroadcastModule'
   s.version        = '1.0.0'
   s.summary        = 'Broadcast remote id over bluetooth'
-  s.description    = 'Broadcast module for drone remote id'
+  s.description    = 'Bluetooth broadcast module for drone remote id'
   s.author         = ''
   s.homepage       = 'https://docs.expo.dev/modules/'
   s.platforms      = {

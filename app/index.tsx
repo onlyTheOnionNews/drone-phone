@@ -17,7 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import crypto from 'react-native-quick-crypto';
 
 // Access the custom native module you created
-const { RidBroadcast } = NativeModules;
+const { RidBroadcastModule } = NativeModules;
 
 const App = () => {
   // --- State Management ---
@@ -70,7 +70,7 @@ const App = () => {
       }
       // Ensure the broadcast is stopped when the component unmounts
       if (isTransmitting) {
-        RidBroadcast.stopBroadcast();
+        RidBroadcastModule.stopBroadcast();
       }
     };
   }, []);
@@ -107,7 +107,7 @@ const App = () => {
     if (isTransmitting) {
       try {
         // Call the native module to stop the broadcast
-        await RidBroadcast.stopBroadcast();
+        await RidBroadcastModule.stopBroadcast();
         setIsTransmitting(false);
         setStatusMessage('Transmission stopped.');
       } catch (e: any) {
@@ -160,7 +160,7 @@ const App = () => {
 
       try {
         // Call the native module to start the broadcast with all the data
-        await RidBroadcast.startBroadcast(droneData);
+        await RidBroadcastModule.startBroadcast(droneData);
         setIsTransmitting(true);
         setStatusMessage(`Broadcasting ID: ${uasSerialNumber}`);
       } catch (e: any) {
