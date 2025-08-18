@@ -1,4 +1,7 @@
-package com.RidBroadcastModule
+package expo.modules.ridbroadcastmodule
+
+import expo.modules.kotlin.modules.Module
+import expo.modules.kotlin.modules.ModuleDefinition
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
@@ -19,7 +22,7 @@ import java.security.Signature
 import java.security.spec.PKCS8EncodedKeySpec
 import java.util.*
 
-class RidBroadcastModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+class RidBroadcastModule : Module() {
 
     private var bluetoothAdapter: BluetoothAdapter?
     private var bluetoothLeAdvertiser: BluetoothLeAdvertiser?
@@ -34,60 +37,6 @@ class RidBroadcastModule(reactContext: ReactApplicationContext) : ReactContextBa
         val bluetoothManager = reactContext.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothAdapter = bluetoothManager.adapter
         bluetoothLeAdvertiser = bluetoothAdapter?.bluetoothLeAdvertiser
-    }
-
-    override fun getName(): String {
-        return "RidBroadcastModule"
-    }
-
-    /**
-     * Starts a periodic broadcast, automatically cycling through different RID frames.
-     * @param data A map containing all necessary data for all frame types.
-     * @param promise Resolves if successful, rejects on error.
-     */
-    @ReactMethod
-    fun startBroadcast(data: ReadableMap, promise: Promise) {
-        try {
-            if (!isBluetoothSupported()) {
-                promise.reject("BLUETOOTH_NOT_SUPPORTED", "Bluetooth LE is not supported on this device")
-                return
-            }
-
-            if (bluetoothAdapter?.isEnabled != true) {
-                promise.reject("BLUETOOTH_DISABLED", "Bluetooth is not enabled")
-                return
-            }
-
-            allDroneData = data
-            stopBroadcastInternal() // Ensure any old timer is stopped
-
-            // Set up a new timer to call updateBroadcastFrame every second
-            broadcastTimer = Timer()
-            broadcastTimer?.scheduleAtFixedRate(object : TimerTask() {
-                override fun run() {
-                    updateBroadcastFrame()
-                }
-            }, 0, 1000)
-
-            isBroadcasting = true
-            promise.resolve(true)
-
-        } catch (e: Exception) {
-            promise.reject("START_BROADCAST_ERROR", e.message, e)
-        }
-    }
-
-    /**
-     * Stops the Bluetooth LE broadcast and cancels the timer.
-     */
-    @ReactMethod
-    fun stopBroadcast(promise: Promise) {
-        try {
-            stopBroadcastInternal()
-            promise.resolve(true)
-        } catch (e: Exception) {
-            promise.reject("STOP_BROADCAST_ERROR", e.message, e)
-        }
     }
 
     private fun stopBroadcastInternal() {
@@ -264,4 +213,55 @@ class RidBroadcastModule(reactContext: ReactApplicationContext) : ReactContextBa
             super.onStartFailure(errorCode)
         }
     }
+    
+  // Each module class must implement the definition function. The definition consists of components
+  // that describes the module's functionality and behavior.
+  // See https://docs.expo.dev/modules/module-api for more details about available components.
+  override fun definition() = ModuleDefinition {
+    
+    // Sets the name of the module that JavaScript code will use to refer to the module. Takes a string as an argument.
+    // Can be inferred from module's class name, but it's recommended to set it explicitly for clarity.
+    // The module will be accessible from `requireNativeModule('MyModule')` in JavaScript.
+    Name("RidBroadcastModule")
+
+    AsyncFunction("startBroadcast") { data: ReadableMap, promise: Promise ->
+      try {
+            if (!isBluetoothSupported()) {
+                promise.reject("BLUETOOTH_NOT_SUPPORTED", "Bluetooth LE is not supported on this device")
+                return
+            }
+
+            if (bluetoothAdapter?.isEnabled != true) {
+                promise.reject("BLUETOOTH_DISABLED", "Bluetooth is not enabled")
+                return
+            }
+
+            allDroneData = data
+            stopBroadcastInternal() // Ensure any old timer is stopped
+
+            // Set up a new timer to call updateBroadcastFrame every second
+            broadcastTimer = Timer()
+            broadcastTimer?.scheduleAtFixedRate(object : TimerTask() {
+                override fun run() {
+                    updateBroadcastFrame()
+                }
+            }, 0, 1000)
+
+            isBroadcasting = true
+            promise.resolve(true)
+
+        } catch (e: Exception) {
+            promise.reject("START_BROADCAST_ERROR", e.message, e)
+        }
+    }
+
+    AsyncFunction("stopBroadcast") { promise: Promise ->
+      try {
+            stopBroadcastInternal()
+            promise.resolve(true)
+        } catch (e: Exception) {
+            promise.reject("STOP_BROADCAST_ERROR", e.message, e)
+        }
+    }
+  }
 }
