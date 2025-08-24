@@ -1,3 +1,17 @@
+# Drone Phone - Drone Reuse Project
+
+This project aims to allow older drones to be renovated to meet broadcasting requirements without expensive Remote ID modules. This can prevent good equipment from going to waste and support basic, low-range flights for filming and testing purposes. Drones should be tested for compliance by pilots before attemtping to launch using software or hardware related to this project.
+
+### Compatible Phone Mounts
+- https://cults3d.com/en/3d-model/tool/dji-phantom-3-phone-mount
+
+iPhone 16 (Home - 1)             |  (Home - 2)
+:-------------------------:|:-------------------------:
+![iPhone Example (Home - 1)](images/Screenshot_iPhone_16_Pro_sim_2025-08-23_20.41.02.png)  |  ![iPhone Example (Home - 2)](images/Screenshot_iPhone_16_Pro_sim_2025-08-23_20.41.19.png)
+![iPhone Example (Home - 3)](images/Screenshot_iPhone_16_Pro_sim_2025-08-23_20.41.24.png)
+
+
+
 # Welcome to your Expo app 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
