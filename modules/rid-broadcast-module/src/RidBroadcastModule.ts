@@ -1,9 +1,8 @@
 import { NativeModule, requireNativeModule } from 'expo';
-
+import { RidBroadcastData } from './RidBroadcastModule.types';
 declare class RidBroadcastModule extends NativeModule {
-  PI: number;
-  hello(): string;
-  setValueAsync(value: string): Promise<void>;
+  startBroadcast(data: RidBroadcastData): Promise<boolean>;
+    stopBroadcast(): Promise<boolean>;
 }
 
 // This call loads the native module object from the JSI.

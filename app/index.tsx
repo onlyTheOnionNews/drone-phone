@@ -1,36 +1,37 @@
-import * as Location from 'expo-location';
-import { LocationObject, LocationSubscription } from 'expo-location';
-import { useEffect, useRef, useState } from 'react';
+import * as Location from "expo-location";
+import { LocationObject, LocationSubscription } from "expo-location";
+import { useEffect, useRef, useState } from "react";
 import {
   Alert,
-  NativeModules,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 // Import the crypto polyfill and its required dependency
-import crypto from 'react-native-quick-crypto';
+import crypto from "react-native-quick-crypto";
 
 // Access the custom native module you created
-const { RidBroadcastModule } = NativeModules;
+import * as RidBroadcastModule from "../modules/rid-broadcast-module";
 
 const App = () => {
   // --- State Management ---
-  const [uasSerialNumber, setUasSerialNumber] = useState('1689Z9876543210ABCDEF');
-  const [operatorId, setOperatorId] = useState('FIN123456789-123');
-  const [selfIdText, setSelfIdText] = useState('Recreational Flight');
-  const [privateKey, setPrivateKey] = useState('');
-  const [publicKey, setPublicKey] = useState('');
+  const [uasSerialNumber, setUasSerialNumber] = useState(
+    "1689Z9876543210ABCDEF",
+  );
+  const [operatorId, setOperatorId] = useState("FIN123456789-123");
+  const [selfIdText, setSelfIdText] = useState("Recreational Flight");
+  const [privateKey, setPrivateKey] = useState("");
+  const [publicKey, setPublicKey] = useState("");
 
   // Operation area
-  const [areaRadius, setAreaRadius] = useState('500');
-  const [areaCeiling, setAreaCeiling] = useState('120');
-  const [areaFloor, setAreaFloor] = useState('0');
+  const [areaRadius, setAreaRadius] = useState("500");
+  const [areaCeiling, setAreaCeiling] = useState("120");
+  const [areaFloor, setAreaFloor] = useState("0");
 
   // Drone's Live Data
   const [location, setLocation] = useState<LocationObject | null>(null);
@@ -38,15 +39,15 @@ const App = () => {
 
   // App State
   const [isTransmitting, setIsTransmitting] = useState(false);
-  const [statusMessage, setStatusMessage] = useState('Ready to transmit.');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [statusMessage, setStatusMessage] = useState("Ready to transmit.");
+  const [errorMessage, setErrorMessage] = useState("");
 
   // --- Permission and Setup Effects ---
   useEffect(() => {
     const setup = async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMessage('Location permission is required.');
+      if (status !== "granted") {
+        setErrorMessage("Location permission is required.");
         return;
       }
 
@@ -58,7 +59,7 @@ const App = () => {
         },
         (newLocation) => {
           setLocation(newLocation);
-        }
+        },
       );
     };
 
@@ -74,57 +75,62 @@ const App = () => {
       }
     };
   }, []);
-  
+
   // --- Key Generation using react-native-crypto ---
   const generateKeys = () => {
     try {
-      const { privateKey: pk, publicKey: pubk } = crypto.generateKeyPairSync('ec', {
-        namedCurve: 'secp256r1',
-        privateKeyEncoding: {
-          type: 'pkcs8',
-          format: 'der' // DER is the binary format needed before Base64 encoding
+      const { privateKey: pk, publicKey: pubk } = crypto.generateKeyPairSync(
+        "ec",
+        {
+          namedCurve: "P-256",
+          privateKeyEncoding: {
+            type: "pkcs8",
+            format: "pem", // DER is the binary format needed before Base64 encoding
+          },
+          publicKeyEncoding: {
+            type: "spki",
+            format: "pem",
+          },
         },
-        publicKeyEncoding: {
-          type: 'spki',
-          format: 'der'
-        }
-      });
+      );
 
       // The privateKey is a Buffer in DER format. Convert it to Base64.
-      setPrivateKey(pk!.toString('base64'));
-      setPublicKey(pubk!.toString('base64'));
+      setPrivateKey(pk!.toString("base64").slice(28, -26));
+      setPublicKey(pubk!.toString("base64").slice(27, -25));
+      const x = "-----BEGIN Public KEY-----";
+      console.log(x.length);
 
       Alert.alert("Success", "New keypair generated successfully.");
     } catch (error: any) {
-        console.error("Key generation failed:", error);
-        Alert.alert("Error", `Failed to generate keypair: ${error.message}`);
+      console.error("Key generation failed:", error);
+      Alert.alert("Error", `Failed to generate keypair: ${error.message}`);
     }
   };
 
   // --- Transmission Control ---
   const handleToggleTransmission = async () => {
-    setErrorMessage('');
+    setErrorMessage("");
     if (isTransmitting) {
       try {
         // Call the native module to stop the broadcast
         await RidBroadcastModule.stopBroadcast();
         setIsTransmitting(false);
-        setStatusMessage('Transmission stopped.');
+        setStatusMessage("Transmission stopped.");
       } catch (e: any) {
         setErrorMessage(`Stop failed: ${e.message}`);
       }
     } else {
       // Validate required fields before starting
       if (!uasSerialNumber || !operatorId) {
-        setErrorMessage('UAS Serial Number and Operator ID are required.');
+        setErrorMessage("UAS Serial Number and Operator ID are required.");
         return;
       }
       if (!location) {
-        setErrorMessage('Cannot transmit without valid location data.');
+        setErrorMessage("Cannot transmit without valid location data.");
         return;
       }
-       if (!privateKey) {
-        setErrorMessage('Please generate a keypair before broadcasting.');
+      if (!privateKey) {
+        setErrorMessage("Please generate a keypair before broadcasting.");
         return;
       }
 
@@ -177,66 +183,136 @@ const App = () => {
         <Text style={styles.subHeader}>ASTM F3411-22a</Text>
 
         <View style={styles.statusSection}>
-          <Text style={styles.statusText}>Status: {isTransmitting ? 'Transmitting' : 'Idle'}</Text>
+          <Text style={styles.statusText}>
+            Status: {isTransmitting ? "Transmitting" : "Idle"}
+          </Text>
           <Text style={styles.messageText}>{statusMessage}</Text>
-          {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+          {errorMessage ? (
+            <Text style={styles.errorText}>{errorMessage}</Text>
+          ) : null}
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>UAS Identification</Text>
           <Text style={styles.label}>UAS Serial Number (CAA-Assigned)</Text>
-          <TextInput style={styles.input} value={uasSerialNumber} onChangeText={setUasSerialNumber} editable={!isTransmitting} />
+          <TextInput
+            style={styles.input}
+            value={uasSerialNumber}
+            onChangeText={setUasSerialNumber}
+            editable={!isTransmitting}
+          />
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Operator & Flight Info</Text>
           <Text style={styles.label}>Operator ID</Text>
-          <TextInput style={styles.input} value={operatorId} onChangeText={setOperatorId} editable={!isTransmitting} />
+          <TextInput
+            style={styles.input}
+            value={operatorId}
+            onChangeText={setOperatorId}
+            editable={!isTransmitting}
+          />
           <Text style={styles.label}>Self-ID Description (Optional)</Text>
-          <TextInput style={styles.input} value={selfIdText} onChangeText={setSelfIdText} editable={!isTransmitting} />
+          <TextInput
+            style={styles.input}
+            value={selfIdText}
+            onChangeText={setSelfIdText}
+            editable={!isTransmitting}
+          />
         </View>
-        
+
         <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Authentication</Text>
-            <TouchableOpacity style={styles.button} onPress={generateKeys} disabled={isTransmitting}>
-                <Text style={styles.buttonText}>Generate Keypair</Text>
-            </TouchableOpacity>
-            <Text style={styles.label}>Private Key (Base64 PKCS#8)</Text>
-            <TextInput style={[styles.input, styles.keyInput]} value={privateKey} editable={false} multiline />
-            <Text style={styles.label}>Public Key (Base64 PKCS#8)</Text>
-            <TextInput style={[styles.input, styles.keyInput]} value={publicKey} editable={false} multiline />
+          <Text style={styles.sectionTitle}>Authentication</Text>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={generateKeys}
+            disabled={isTransmitting}
+          >
+            <Text style={styles.buttonText}>Generate Keypair</Text>
+          </TouchableOpacity>
+          <Text style={styles.label}>Private Key (Base64 PKCS#8)</Text>
+          <TextInput
+            style={[styles.input, styles.keyInput]}
+            value={privateKey}
+            editable={false}
+            multiline
+          />
+          <Text style={styles.label}>Public Key (Base64 PKCS#8)</Text>
+          <TextInput
+            style={[styles.input, styles.keyInput]}
+            value={publicKey}
+            editable={false}
+            multiline
+          />
         </View>
-        
+
         <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Operation Area</Text>
-            <Text style={styles.label}>Area Radius (meters)</Text>
-            <TextInput style={styles.input} value={areaRadius} onChangeText={setAreaRadius} editable={!isTransmitting} keyboardType="numeric" />
-            <View style={styles.row}>
-                <View style={styles.col}>
-                    <Text style={styles.label}>Area Ceiling (meters)</Text>
-                    <TextInput style={styles.input} value={areaCeiling} onChangeText={setAreaCeiling} editable={!isTransmitting} keyboardType="numeric" />
-                </View>
-                <View style={styles.col}>
-                    <Text style={styles.label}>Area Floor (meters)</Text>
-                    <TextInput style={styles.input} value={areaFloor} onChangeText={setAreaFloor} editable={!isTransmitting} keyboardType="numeric" />
-                </View>
+          <Text style={styles.sectionTitle}>Operation Area</Text>
+          <Text style={styles.label}>Area Radius (meters)</Text>
+          <TextInput
+            style={styles.input}
+            value={areaRadius}
+            onChangeText={setAreaRadius}
+            editable={!isTransmitting}
+            keyboardType="numeric"
+          />
+          <View style={styles.row}>
+            <View style={styles.col}>
+              <Text style={styles.label}>Area Ceiling (meters)</Text>
+              <TextInput
+                style={styles.input}
+                value={areaCeiling}
+                onChangeText={setAreaCeiling}
+                editable={!isTransmitting}
+                keyboardType="numeric"
+              />
             </View>
+            <View style={styles.col}>
+              <Text style={styles.label}>Area Floor (meters)</Text>
+              <TextInput
+                style={styles.input}
+                value={areaFloor}
+                onChangeText={setAreaFloor}
+                editable={!isTransmitting}
+                keyboardType="numeric"
+              />
+            </View>
+          </View>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Live Telemetry</Text>
           <View style={styles.row}>
-            <View style={styles.col}><Text style={styles.label}>Latitude</Text><TextInput style={styles.input} value={location ? location.coords.latitude.toFixed(6) : '...'} editable={false} /></View>
-            <View style={styles.col}><Text style={styles.label}>Longitude</Text><TextInput style={styles.input} value={location ? location.coords.longitude.toFixed(6) : '...'} editable={false} /></View>
+            <View style={styles.col}>
+              <Text style={styles.label}>Latitude</Text>
+              <TextInput
+                style={styles.input}
+                value={location ? location.coords.latitude.toFixed(6) : "..."}
+                editable={false}
+              />
+            </View>
+            <View style={styles.col}>
+              <Text style={styles.label}>Longitude</Text>
+              <TextInput
+                style={styles.input}
+                value={location ? location.coords.longitude.toFixed(6) : "..."}
+                editable={false}
+              />
+            </View>
           </View>
         </View>
 
         <View style={styles.transmissionControl}>
           <TouchableOpacity
-            style={[styles.button, isTransmitting ? styles.stopButton : styles.startButton]}
+            style={[
+              styles.button,
+              isTransmitting ? styles.stopButton : styles.startButton,
+            ]}
             onPress={handleToggleTransmission}
           >
-            <Text style={styles.buttonText}>{isTransmitting ? 'Stop Transmitting' : 'Start Transmitting'}</Text>
+            <Text style={styles.buttonText}>
+              {isTransmitting ? "Stop Transmitting" : "Start Transmitting"}
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -245,39 +321,94 @@ const App = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f4f6f8' },
+  container: { flex: 1, backgroundColor: "#f4f6f8" },
   scrollContainer: { padding: 20 },
-  header: { fontSize: 28, fontWeight: 'bold', color: '#2c3e50', textAlign: 'center' },
-  subHeader: { fontSize: 16, color: '#7f8c8d', textAlign: 'center', marginBottom: 20 },
-  statusSection: { backgroundColor: '#fff', padding: 15, borderRadius: 8, marginBottom: 20, borderWidth: 1, borderColor: '#dfe6e9' },
-  statusText: { fontSize: 16, fontWeight: 'bold', color: '#2c3e50', textAlign: 'center' },
-  messageText: { fontSize: 14, color: '#7f8c8d', textAlign: 'center', marginTop: 4 },
-  errorText: { color: '#c0392b', textAlign: 'center', marginTop: 5, fontWeight: 'bold' },
-  section: { backgroundColor: '#ffffff', borderRadius: 8, padding: 15, marginBottom: 20, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 3, elevation: 3 },
-  sectionTitle: { fontSize: 20, fontWeight: '600', color: '#34495e', marginBottom: 15 },
-  label: { fontSize: 14, color: '#34495e', marginBottom: 5 },
-  input: { backgroundColor: '#ecf0f1', borderRadius: 5, paddingHorizontal: 15, paddingVertical: 12, fontSize: 16, color: '#2c3e50', marginBottom: 10 },
-  keyInput: { height: 100, textAlignVertical: 'top' },
-  row: { flexDirection: 'row', justifyContent: 'space-between' },
+  header: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#2c3e50",
+    textAlign: "center",
+  },
+  subHeader: {
+    fontSize: 16,
+    color: "#7f8c8d",
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  statusSection: {
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: "#dfe6e9",
+  },
+  statusText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#2c3e50",
+    textAlign: "center",
+  },
+  messageText: {
+    fontSize: 14,
+    color: "#7f8c8d",
+    textAlign: "center",
+    marginTop: 4,
+  },
+  errorText: {
+    color: "#c0392b",
+    textAlign: "center",
+    marginTop: 5,
+    fontWeight: "bold",
+  },
+  section: {
+    backgroundColor: "#ffffff",
+    borderRadius: 8,
+    padding: 15,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#34495e",
+    marginBottom: 15,
+  },
+  label: { fontSize: 14, color: "#34495e", marginBottom: 5 },
+  input: {
+    backgroundColor: "#ecf0f1",
+    borderRadius: 5,
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: "#2c3e50",
+    marginBottom: 10,
+  },
+  keyInput: { height: 100, textAlignVertical: "top" },
+  row: { flexDirection: "row", justifyContent: "space-between" },
   col: { flex: 1, marginRight: 10 },
   transmissionControl: { marginTop: 10, marginBottom: 20 },
   button: {
-    backgroundColor: '#3498db',
+    backgroundColor: "#3498db",
     paddingVertical: 15,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 10,
   },
   startButton: {
-    backgroundColor: '#27ae60',
+    backgroundColor: "#27ae60",
   },
   stopButton: {
-    backgroundColor: '#c0392b',
+    backgroundColor: "#c0392b",
   },
   buttonText: {
-    color: 'white',
+    color: "white",
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });
 

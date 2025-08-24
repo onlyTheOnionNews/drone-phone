@@ -41,22 +41,3 @@ export type RidBroadcastData = {
   // Authentication
   privateKey: string; // Base64 encoded PKCS#8 private key
 };
-
-/**
- * Defines the interface of the native module, exposing its methods
- * to the React Native bridge.
- */
-export interface RidBroadcastModule {
-  /**
-   * Starts the periodic broadcast, automatically cycling through RID frames.
-   * @param data An object containing all required drone data.
-   * @returns A promise that resolves with `true` if the broadcast starts successfully.
-   */
-  startBroadcast(data: RidBroadcastData): Promise<boolean>;
-
-  /**
-   * Stops the broadcast.
-   * @returns A promise that resolves with `true` if the broadcast stops successfully.
-   */
-  stopBroadcast(): Promise<boolean>;
-}
