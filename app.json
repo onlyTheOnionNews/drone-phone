@@ -10,7 +10,10 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.onlytheonionnews.dronephone"
+      "bundleIdentifier": "com.onlytheonionnews.dronephone",
+      "infoPList": {
+        "NSBluetoothAlwaysUseDecription": "Use Bluetooth to broadcast to nearby devices"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -20,7 +23,9 @@
       "edgeToEdgeEnabled": true,
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
-        "android.permission.ACCESS_FINE_LOCATION"
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.BLUETOOTH",
+        "android.permission.BLUETOOTH_ADVERTISE"
       ],
       "package": "com.onlytheonionnews.dronephone"
     },
